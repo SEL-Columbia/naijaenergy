@@ -1,0 +1,29 @@
+{
+  "name": "naijaenergy-browser",
+  "version": "0.0.0",
+  "description": "browser component of naijaenergy",
+  "browserify": {
+    "transform": [
+      "brfs",
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "jquery": "$"
+  },
+  "dependencies": {
+    "brfs": "^1.2.0",
+    "d3": "^3.4.11",
+    "hyperquest": "^0.3.0",
+    "leaflet": "^0.7.3",
+    "level": "^0.18.0",
+    "mori": "*",
+    "multilevel": "^6.0.1"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "myf",
+  "license": "MIT"
+}
