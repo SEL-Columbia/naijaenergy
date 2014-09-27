@@ -1,8 +1,10 @@
 var http  = require('http');
 var express = require('express');
+var compression = require('compression');
 var server = express();
 var get_lga = require('./lgas_json');
 //var routing = require('router');
+server.use(compression());
 server.use(express.static(__dirname + '/../browser'));
 
 server.get('/state/:state', function(req, res) {
