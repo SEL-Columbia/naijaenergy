@@ -1,6 +1,8 @@
 var level = require('level');
+var sublevel = require('sublevel')';
 var fs = require('fs');
 var db = level('.leveldb', {valueEncoding: 'json'});
+var lga = sublevel(db, 'lgas');
 var get_unique_lga = require('./adding_unique_lga');
 
 var write_db = function (file) {
