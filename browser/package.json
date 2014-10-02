@@ -2,15 +2,6 @@
   "name": "naijaenergy-browser",
   "version": "0.0.0",
   "description": "browser component of naijaenergy",
-  "browserify": {
-    "transform": [
-      "brfs",
-      "browserify-shim"
-    ]
-  },
-  "browserify-shim": {
-    "jquery": "$"
-  },
   "dependencies": {
     "brfs": "^1.2.0",
     "d3": "^3.4.11",
