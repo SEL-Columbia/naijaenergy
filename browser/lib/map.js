@@ -78,13 +78,16 @@ var add_lga_layer = function(map, ev) {
     var slug = sluggify(ev.target.feature.properties.Name);
     get_json('/state/' + slug, function(err, res) {
         var lga_layer = leaflet.geoJson(res, {
-            onEachFeature: on_each_feature_lga;
+            onEachFeature: on_each_feature_lga
         });
         if(map.current_layer) {
             map.removeLayer(map.current_layer);
         }
         map.current_layer = lga_layer;
         lga_layer.addTo(map);
+        if (!leaflet.Browser.ie && !leaflet.Browser.opera) {
+            layer.bringToFront();
+        }
     });
 };
 
@@ -115,10 +118,11 @@ var on_each_feature_lga = function(feature, layer) {
 var gen_states_layer = function(map) {
     get_json('/state/__nigeria', function(err, states) {
         var state_layer = leaflet.geoJson(states, {
-            //style: style,
+            style: style,
             onEachFeature: on_each_feature(map, states_layer)
         });
         state_layer.addTo(map);
+        osm_layer.addTo(map);
     });
 }
 
