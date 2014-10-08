@@ -1,5 +1,6 @@
 var level = require('level');
 var sublevel = require('sublevel');
+var _ = require('underscore');
 var fs = require('fs');
 var db = level('.leveldb', {valueEncoding: 'json'});
 var geojson_sub = sublevel(db, 'geojson');
@@ -12,7 +13,7 @@ var sluggify = function(name) {
  	            .replace(/\s+/gi, "_");
 };
 
-var write_db = function (lga, state) {
+var write_geojson_db = function (lga, state) {
     var get_unique_lga = require('./adding_unique_lga');
     fs.readFile(lga, function(err, data) {
         if (err)
@@ -42,24 +43,22 @@ var write_db = function (lga, state) {
         });
     });
 };
-write_db('lgas.json', 'states.json');
-var data_db = function(file) {
+write_geojson_db('lgas.json', 'states.json');
+
+var write_data_db = function(file) {
     fs.readFile(file, function(err, data) {
         if (err)
             throw err;
         var energy = JSON.parse(data.toString());
-        energy.forEach(function(e) {
-            var key = Object.keys(e)[0];
-            if (e[key] !== null)
-            data_sub.put(key, e[key], function(err) {
-                if (err) {
+        _.keys(energy).forEach(function(key) {
+            data_sub.put(key, energy[key], function(err) {
+                if (err) 
                     throw(err);
-                }
             });
         });
     });
 };
 
-data_db('raw.json');
+write_data_db('raw.json');
             
 
