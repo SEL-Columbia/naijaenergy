@@ -8,9 +8,11 @@
     "csv-streamify": "^1.0.0",
     "express": "^4.9.5",
     "level": "^0.18.0",
+    "level-index": "^1.0.4",
+    "level-sublevel": "^6.3.13",
+    "map-reduce": "^6.0.2",
     "mapnik": "*",
     "multilevel": "^6.0.1",
-    "sublevel": "^2.4.0",
     "through": "^2.3.6",
     "underscore": "^1.7.0"
   },

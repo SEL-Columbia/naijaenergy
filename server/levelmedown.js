@@ -1,5 +1,5 @@
 var level = require('level');
-var sublevel = require('sublevel');
+var sublevel = require('level-sublevel');
 var _ = require('underscore');
 var fs = require('fs');
 var db = level('.leveldb', {valueEncoding: 'json'});

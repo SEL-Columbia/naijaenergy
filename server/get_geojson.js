@@ -1,5 +1,5 @@
 var level = require('level');
-var sublevel = require('sublevel');
+var sublevel = require('level-sublevel');
 var db = level('.leveldb', {valueEncoding: 'json'});
 var geojson_sub = sublevel(db, 'geojson');
 var pipeline = function(collection, cb) {
