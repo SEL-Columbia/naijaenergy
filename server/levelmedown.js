@@ -1,10 +1,11 @@
 var level = require('level');
-var sublevel = require('level-sublevel');
+var sub = require('level-sublevel');
 var _ = require('underscore');
+var JSONStream = require('JSONStream');
 var fs = require('fs');
-var db = level('.leveldb', {valueEncoding: 'json'});
-var geojson_sub = sublevel(db, 'geojson');
-var data_sub = sublevel(db, 'data');
+var mapped_index = require('level-mapped-index');
+var geojson_db = mapped_index(sub(level('db/geojson', {valueEncoding: 'json'})));
+var data_db = mapped_index(sub(level('db/data', {valueEncoding: 'json'})));
 
 var sluggify = function(name) {
     return name
@@ -22,7 +23,7 @@ var write_geojson_db = function (lga, state) {
         get_unique_lga(function(lgas_json) {
             lgas.features.forEach(function(lga) {
                 var lga_id = lga.properties.lga_id;
-                geojson_sub.put(lgas_json[lga_id], lga, function(err) {
+                geojson_db.put(lgas_json[lga_id], lga, function(err) {
                     if (err)
                         throw err;
                 });
@@ -36,7 +37,7 @@ var write_geojson_db = function (lga, state) {
         states.features.forEach(function(state) {
             var state_name = sluggify(state.properties.Name);
             console.log(state_name);
-            geojson_sub.put('__nigeria_' + state_name , state, function(err) {
+            geojson_db.put('__nigeria_' + state_name , state, function(err) {
                 if (err)
                     throw err;
             });
@@ -45,13 +46,22 @@ var write_geojson_db = function (lga, state) {
 };
 write_geojson_db('lgas.json', 'states.json');
 
+var write_data_db_async =function(file) {
+    var rs = fs.createReadStream(file);
+    rs
+        .pipe(JSONStream.parse())
+        .on('data', function(data) {
+            console.log(data);
+        });
+};
+
 var write_data_db = function(file) {
     fs.readFile(file, function(err, data) {
         if (err)
             throw err;
         var energy = JSON.parse(data.toString());
         _.keys(energy).forEach(function(key) {
-            data_sub.put(key, energy[key], function(err) {
+            data_db.put(key, energy[key], function(err) {
                 if (err) 
                     throw(err);
             });
