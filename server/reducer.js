@@ -7,4 +7,4 @@ var data_db =require('./levelmedown').data_db;
 var mapper = require('./levelmedown').mapdb;
 var write_data_db = require('./levelmedown').write_data_db;
 
-write_data_db('raw_with_key_prettified.json', data_db);
+write_data_db('raw.json', data_db);

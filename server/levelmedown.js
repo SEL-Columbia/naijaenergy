@@ -67,18 +67,42 @@ var mapper = function (key, value, emit) {
     //value is an obj: src, power_type, power_access, lat, long, 
     //functional_status, facility_type_display
     var unique_lga = key.split('!')[0];
-    if(typeof value.src === 'object') {
-        console.log(value.src);
-    }
-    emit(unique_lga, value.src);
+    emit(['all', unique_lga], JSON.stringify(value.src));
 };
 
 var reducer = function(acc, value, key) {
-    acc[value] = (acc[value] || 0) + 1;
-    console.log(acc);
-    return acc;
-    //return JSON.stringify(acc);
+    /*
+    if (acc === undefined) {
+        acc = '{}';
+    }
+    
+
+    try {
+        acc = JSON.parse(acc);
+    } catch (e) {
+        console.log('zaiming sucks');
+    }
+    */
+    acc = JSON.parse(acc);
+    value = JSON.parse(value);
+    if('string' === typeof value) {
+        acc[value] = (acc[value] || 0) + 1;
+        return JSON.stringify(acc);
+    }
+
+    for (var src in value) {
+        acc[src] = (acc[src] || 0) + value[src];
+    }
+    return JSON.stringify(acc);
 };
 
-exports.mapdb = mapreduce(data_db, 'state_aggregate', mapper, reducer, {});
+exports.mapdb = mapreduce(data_db, 'state_aggregate', mapper, reducer, '{}');
+exports.get_data = function(db, rg) {
+    db
+        .createReadStream({range: rg})
+        .on('data', function(data) {
+            console.log(data.value);
+        });
+};
+
 
