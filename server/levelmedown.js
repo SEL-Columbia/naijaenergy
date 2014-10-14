@@ -3,9 +3,12 @@ var sub = require('level-sublevel');
 var _ = require('underscore');
 var JSONStream = require('JSONStream');
 var fs = require('fs');
-var mapped_index = require('level-mapped-index');
-var geojson_db = mapped_index(sub(level('db/geojson', {valueEncoding: 'json'})));
-var data_db = mapped_index(sub(level('db/data', {valueEncoding: 'json'})));
+var mapreduce = require('map-reduce');
+var geojson_db = sub(level('db/geojson', {valueEncoding: 'json'}));
+var data_db = sub(level('db/data', {valueEncoding: 'json'}));
+
+exports.data_db = data_db;
+exports.geojson_db = geojson_db;
 
 var sluggify = function(name) {
     return name
@@ -14,7 +17,7 @@ var sluggify = function(name) {
  	            .replace(/\s+/gi, "_");
 };
 
-var write_geojson_db = function (lga, state) {
+exports.write_geojson_db = function (lga, state) {
     var get_unique_lga = require('./adding_unique_lga');
     fs.readFile(lga, function(err, data) {
         if (err)
@@ -44,21 +47,38 @@ var write_geojson_db = function (lga, state) {
         });
     });
 };
-write_geojson_db('lgas.json', 'states.json');
 
-var write_data_db_async =function(file, db) {
+exports.write_data_db = function(file, db) {
     var rs = fs.createReadStream(file);
     rs
         .pipe(JSONStream.parse('*'))
         .on('data', function(data) {
             var key = data.key;
             delete data.key;
-            console.log(key, data);
-            db.put(data.key, data, function(err) {
+            db.put(key, data, function(err) {
                 if (err)
                     throw(err);
             });
         });
 };
-write_data_db_async('raw_with_key_prettified.json', data_db);
+
+var mapper = function (key, value, emit) {
+    //key is fct_bwari!dsfsdfasfasf
+    //value is an obj: src, power_type, power_access, lat, long, 
+    //functional_status, facility_type_display
+    var unique_lga = key.split('!')[0];
+    if(typeof value.src === 'object') {
+        console.log(value.src);
+    }
+    emit(unique_lga, value.src);
+};
+
+var reducer = function(acc, value, key) {
+    acc[value] = (acc[value] || 0) + 1;
+    console.log(acc);
+    return acc;
+    //return JSON.stringify(acc);
+};
+
+exports.mapdb = mapreduce(data_db, 'state_aggregate', mapper, reducer, {});
 
