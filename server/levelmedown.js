@@ -46,29 +46,19 @@ var write_geojson_db = function (lga, state) {
 };
 write_geojson_db('lgas.json', 'states.json');
 
-var write_data_db_async =function(file) {
+var write_data_db_async =function(file, db) {
     var rs = fs.createReadStream(file);
     rs
-        .pipe(JSONStream.parse())
+        .pipe(JSONStream.parse('*'))
         .on('data', function(data) {
-            console.log(data);
-        });
-};
-
-var write_data_db = function(file) {
-    fs.readFile(file, function(err, data) {
-        if (err)
-            throw err;
-        var energy = JSON.parse(data.toString());
-        _.keys(energy).forEach(function(key) {
-            data_db.put(key, energy[key], function(err) {
-                if (err) 
+            var key = data.key;
+            delete data.key;
+            console.log(key, data);
+            db.put(data.key, data, function(err) {
+                if (err)
                     throw(err);
             });
         });
-    });
 };
-
-write_data_db('raw.json');
-            
+write_data_db_async('raw_with_key_prettified.json', data_db);
 
