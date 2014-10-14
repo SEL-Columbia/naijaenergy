@@ -9,17 +9,16 @@ var mapper = function (key, value, emit) {
     //value is an obj: src, power_type, power_access, lat, long, 
     //functional_status, facility_type_display
     var unique_lga = key.split('!')[0];
-    var src = value.src;
-    emit(unique_lga, src);
+    emit(unique_lga, value.src);
 };
 
 var reducer = function(acc, value, key) {
-    acc = JSON.parse(acc);
-    value = JSON.parse(value);
+    debugger;
     acc[value] = (acc[value] || 0) + 1;
-    return JSON.stringify(acc);
+    return acc;
+    //return JSON.stringify(acc);
 };
 
-var state_aggregate = mapreduce(data_db, 'state_aggregate', mapper, reducer, 0);
+var state_aggregate = mapreduce(data_db, 'state_aggregate', mapper, reducer, {});
 exports.state_aggregate = state_aggregate;
 exports.data_db = data_db;
