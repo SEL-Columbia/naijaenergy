@@ -53,8 +53,11 @@ exports.write_data_db = function(file, db) {
     rs
         .pipe(JSONStream.parse('*'))
         .on('data', function(data) {
-            var key = data.key;
-            delete data.key;
+            var key = data.state + 
+                      '::' +
+                      data.lga +
+                      '::' +
+                      data.survey_id;
             db.put(key, data, function(err) {
                 if (err)
                     throw(err);
@@ -66,8 +69,7 @@ var mapper = function (key, value, emit) {
     //key is fct_bwari!dsfsdfasfasf
     //value is an obj: src, power_type, power_access, lat, long, 
     //functional_status, facility_type_display
-    var unique_lga = key.split('!')[0];
-    emit(['all', unique_lga], JSON.stringify(value.src));
+    emit(['all', value.state, value.lga], JSON.stringify(value.src));
 };
 
 var reducer = function(acc, value, key) {
