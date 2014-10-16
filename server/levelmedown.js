@@ -17,7 +17,7 @@ var sluggify = function(name) {
  	            .replace(/\s+/gi, "_");
 };
 
-exports.write_geojson_db = function (lga, state) {
+exports.write_geojson_db = function (lga, state, geojson_db) {
     var get_unique_lga = require('./adding_unique_lga');
     fs.readFile(lga, function(err, data) {
         if (err)
