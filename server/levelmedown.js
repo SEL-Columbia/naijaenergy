@@ -1,10 +1,14 @@
 var level = require('level');
-var sublevel = require('sublevel');
+var sub = require('level-sublevel');
 var _ = require('underscore');
+var JSONStream = require('JSONStream');
 var fs = require('fs');
-var db = level('.leveldb', {valueEncoding: 'json'});
-var geojson_sub = sublevel(db, 'geojson');
-var data_sub = sublevel(db, 'data');
+var mapreduce = require('map-reduce');
+var geojson_db = sub(level('db/geojson', {valueEncoding: 'json'}));
+var data_db = sub(level('db/data', {valueEncoding: 'json'}));
+
+exports.data_db = data_db;
+exports.geojson_db = geojson_db;
 
 var sluggify = function(name) {
     return name
@@ -13,7 +17,7 @@ var sluggify = function(name) {
  	            .replace(/\s+/gi, "_");
 };
 
-var write_geojson_db = function (lga, state) {
+exports.write_geojson_db = function (lga, state, geojson_db) {
     var get_unique_lga = require('./adding_unique_lga');
     fs.readFile(lga, function(err, data) {
         if (err)
@@ -22,7 +26,7 @@ var write_geojson_db = function (lga, state) {
         get_unique_lga(function(lgas_json) {
             lgas.features.forEach(function(lga) {
                 var lga_id = lga.properties.lga_id;
-                geojson_sub.put(lgas_json[lga_id], lga, function(err) {
+                geojson_db.put(lgas_json[lga_id], lga, function(err) {
                     if (err)
                         throw err;
                 });
@@ -36,29 +40,71 @@ var write_geojson_db = function (lga, state) {
         states.features.forEach(function(state) {
             var state_name = sluggify(state.properties.Name);
             console.log(state_name);
-            geojson_sub.put('__nigeria_' + state_name , state, function(err) {
+            geojson_db.put('__nigeria_' + state_name , state, function(err) {
                 if (err)
                     throw err;
             });
         });
     });
 };
-write_geojson_db('lgas.json', 'states.json');
 
-var write_data_db = function(file) {
-    fs.readFile(file, function(err, data) {
-        if (err)
-            throw err;
-        var energy = JSON.parse(data.toString());
-        _.keys(energy).forEach(function(key) {
-            data_sub.put(key, energy[key], function(err) {
-                if (err) 
+exports.write_data_db = function(file, db) {
+    var rs = fs.createReadStream(file);
+    rs
+        .pipe(JSONStream.parse('*'))
+        .on('data', function(data) {
+            var key = data.state + 
+                      '::' +
+                      data.lga +
+                      '::' +
+                      data.survey_id;
+            db.put(key, data, function(err) {
+                if (err)
                     throw(err);
             });
         });
-    });
 };
 
-write_data_db('raw.json');
-            
+var mapper = function (key, value, emit) {
+    //key is fct_bwari!dsfsdfasfasf
+    //value is an obj: src, power_type, power_access, lat, long, 
+    //functional_status, facility_type_display
+    emit(['all', value.state, value.lga], JSON.stringify(value.src));
+};
+
+var reducer = function(acc, value, key) {
+    /*
+    if (acc === undefined) {
+        acc = '{}';
+    }
+    
+
+    try {
+        acc = JSON.parse(acc);
+    } catch (e) {
+        console.log('zaiming sucks');
+    }
+    */
+    acc = JSON.parse(acc);
+    value = JSON.parse(value);
+    if('string' === typeof value) {
+        acc[value] = (acc[value] || 0) + 1;
+        return JSON.stringify(acc);
+    }
+
+    for (var src in value) {
+        acc[src] = (acc[src] || 0) + value[src];
+    }
+    return JSON.stringify(acc);
+};
+
+exports.mapdb = mapreduce(data_db, 'state_aggregate', mapper, reducer, '{}');
+exports.get_data = function(db, rg) {
+    db
+        .createReadStream({range: rg})
+        .on('data', function(data) {
+            console.log(data.value);
+        });
+};
+
 

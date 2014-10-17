@@ -1,7 +1,6 @@
 var level = require('level');
-var sublevel = require('sublevel');
-var db = level('.leveldb', {valueEncoding: 'json'});
-var geojson_sub = sublevel(db, 'geojson');
+var sub = require('level-sublevel');
+var geojson_sub = require('./levelmedown').geojson_db;
 var pipeline = function(collection, cb) {
     var rs = geojson_sub.createReadStream({start: collection, end: collection + '\xff'});
     var geojson = { type: "FeatureCollection",
@@ -9,7 +8,7 @@ var pipeline = function(collection, cb) {
     };
     rs
         .on('data', function(data) {
-            geojson.features.push(data.value)
+            geojson.features.push(data.value);
         })
         .on('error', function(err) {
             if (cb)

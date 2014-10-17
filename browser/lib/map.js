@@ -86,7 +86,7 @@ var add_lga_layer = function(map, ev) {
         map.current_layer = lga_layer;
         lga_layer.addTo(map);
         if (!leaflet.Browser.ie && !leaflet.Browser.opera) {
-            layer.bringToFront();
+            lga_layer.bringToFront();
         }
     });
 };
@@ -124,7 +124,7 @@ var gen_states_layer = function(map) {
         state_layer.addTo(map);
         osm_layer.addTo(map);
     });
-}
+};
 
 gen_states_layer(map);
 
