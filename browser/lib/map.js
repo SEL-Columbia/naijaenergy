@@ -1,6 +1,5 @@
 var leaflet = require('leaflet');
 var http = require('http');
-var hyperquest =require('hyperquest');
 var get_json = require('./get_json');
 
 leaflet.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
@@ -103,14 +102,14 @@ var on_each_feature = function(lmap, geolayer) {
         layer.on({
             //mouseover: highlight,
             //mouseout:  reset_style,
-            click:     click_ev(lmap)
+            dblclick:     click_ev(lmap)
         });
     };
 };
 
 var on_each_feature_lga = function(feature, layer) {
     layer.on({
-        click: zoom_lga
+        dblclick: zoom_lga
     });
 };
 
