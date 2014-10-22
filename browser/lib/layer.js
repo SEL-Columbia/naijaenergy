@@ -4,17 +4,19 @@ var get_json = require('./get_json');
 var geojson_layer = function(loc, map) {
     this.loc = loc;
     this.map = map;
+    this.layer = this.layer_init();
 };
 
 geojson_layer.prototype.layer_init = function() {
-    get_json(this.loc, function(err, data) {
+    var self = this;
+    get_json(self.loc, function(err, data) {
         if (err)
             throw err;
         console.log(data);
         return leaflet.geoJson(data, {
-            style: this.style,
-            onEachFeature: this.on_each_feature
-        });
+            style: self.style,
+            onEachFeature: self.on_each_feature
+        }).addTo(self.map);
     });
 };
 
