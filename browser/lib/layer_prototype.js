@@ -81,21 +81,6 @@ geojson_layer.prototype.highlight = function(ev) {
     }
 };
 
-geojson_layer.prototype.reset_style = function(ev) {
-        return this.layer.resetStyle(ev.target);
-};
-
-geojson_layer.prototype.on_each_feature = function(feature, layer) {
-    var self = this;
-    //console.log('wat', this);
-    layer.on({
-        click: self.click_ev
-        //mouseover: self.highlight,
-        //mouseout: self.reset_style,
-        //dblclick: self.click_ev
-    });
-};
-
 geojson_layer.prototype.click_ev = function(ev) {
     console.log(this);
     this.zoom_to(ev);
