@@ -22,6 +22,7 @@ var geojson_layer = function(geojson, map) {
             });
         }
     }).addTo(map);
+    this.map.fitBounds(this.layer.getBounds());
 
 };
 
