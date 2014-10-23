@@ -1,6 +1,7 @@
 var leaflet = require('leaflet');
 var http = require('http');
 var get_json = require('./get_json');
+var layer = require('./layer_module');
 
 leaflet.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
 
@@ -17,8 +18,15 @@ var osm_layer = leaflet.tileLayer(osm_server, {
         attribution: "Open Street Map"
     });
 
-var layer = require('./layer');
-var state_layer = new layer('/state/__nigeria', map);
+osm_layer.addTo(map);
+
+var gen_geojson_layer = function(map) {
+    get_json('/state/__nigeria', function(err, data) {
+        var state_layer = new layer(data, map);
+    });
+};
+
+gen_geojson_layer(map);
 
 //
 //

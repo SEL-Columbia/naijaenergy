@@ -1,23 +1,25 @@
 var leaflet = require('leaflet');
 var get_json = require('./get_json');
 
-var geojson_layer = function(loc, map) {
-    this.loc = loc;
+var geojson_layer = function(geojson, map) {
+    var self = this;
+    this.geojson = geojson;
     this.map = map;
-    this.layer = this.layer_init();
+    this.click_ev = function(){
+    }
 };
 
-geojson_layer.prototype.layer_init = function() {
+geojson_layer.prototype.layer = function() {
     var self = this;
-    get_json(self.loc, function(err, data) {
-        if (err)
-            throw err;
-        console.log(data);
-        return leaflet.geoJson(data, {
-            style: self.style,
-            onEachFeature: self.on_each_feature
-        }).addTo(self.map);
-    });
+    return leaflet.geoJson(self.geojson, {
+        style: self.style,
+        onEachFeature: function(feature, layer) {
+            layer.on({
+                click: self.click_ev
+            });
+            //self.on_each_feature(feature, layer);
+        }
+    }).addTo(self.map);
 };
 
 var heat_color = function(d) {
@@ -59,10 +61,27 @@ geojson_layer.prototype.reset_style = function(ev) {
 };
 
 geojson_layer.prototype.on_each_feature = function(feature, layer) {
+    var self = this;
+    //console.log('wat', this);
     layer.on({
-        mouseover: this.highlight,
-        mouseout: this.reset_style,
-        dblclick: this.click_ev
+        click: self.click_ev
+        //mouseover: self.highlight,
+        //mouseout: self.reset_style,
+        //dblclick: self.click_ev
+    });
+};
+
+geojson_layer.prototype.click_ev = function(ev) {
+    console.log(this);
+    this.zoom_to(ev);
+    //this.load_next_layer(ev);
+};
+
+geojson_layer.prototype.load_next_layer = function(ev) {
+    var self = this;
+    get_json('/state/' + slug, function(err, res) {
+        var secondary_layer = new geojson_layer(res, map).layer;
+        secondary_layer.addTo(self.map);
     });
 };
 
