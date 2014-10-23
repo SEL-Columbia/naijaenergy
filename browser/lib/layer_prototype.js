@@ -5,8 +5,31 @@ var geojson_layer = function(geojson, map) {
     var self = this;
     this.geojson = geojson;
     this.map = map;
-    this.click_ev = function(){
-    }
+    this.click_ev = function(ev) {
+        self.zoom_to(ev);
+        self.load_next_layer(ev);
+    };
+    this.reset_style = function(ev) {
+        return self.layer.resetStyle(ev.target);
+    };
+    this.layer = leaflet.geoJson(self.geojson, {
+        style: self.style,
+        onEachFeature: function(feature, layer) {
+            layer.on({
+                click: self.click_ev,
+                mouseover: self.highlight,
+                mouseout: self.reset_style,
+            });
+        }
+    }).addTo(map);
+
+};
+
+var sluggify = function(name) {
+    return name
+                .toLowerCase()
+                .replace(/[^-a-zA-Z0-9\s+]+/ig, '')
+                .replace(/\s+/gi, "_");
 };
 
 geojson_layer.prototype.layer = function() {
@@ -15,7 +38,8 @@ geojson_layer.prototype.layer = function() {
         style: self.style,
         onEachFeature: function(feature, layer) {
             layer.on({
-                click: self.click_ev
+                click: self.click_ev,
+
             });
             //self.on_each_feature(feature, layer);
         }
@@ -79,9 +103,9 @@ geojson_layer.prototype.click_ev = function(ev) {
 
 geojson_layer.prototype.load_next_layer = function(ev) {
     var self = this;
+    var slug = sluggify(ev.target.feature.properties.Name);
     get_json('/state/' + slug, function(err, res) {
-        var secondary_layer = new geojson_layer(res, map).layer;
-        secondary_layer.addTo(self.map);
+        var secondary_layer = new geojson_layer(res, self.map);
     });
 };
 

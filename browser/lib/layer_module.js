@@ -2,9 +2,10 @@ var leaflet = require('leaflet');
 var get_json = require('./get_json');
 
 var layer = function(geojson, map) {
+    console.log('mod', map);
     this.geojson = geojson;
     this.map = map;
-    var self = this;
+    var that = this;
     return leaflet.geoJson(geojson, {
         style: style,
         onEachFeature: on_each_feature
@@ -50,20 +51,20 @@ var reset_style = function(ev) {
 };
 
 var zoom_to = function(ev) {
+    console.log(that);
     map.fitBounds(ev.target.getBounds());
 };
 
 var click_ev = function(ev) {
-    console.log(this);
     zoom_to(ev);
     //load_next_layer(ev);
 };
 
 var on_each_feature = function(feature, layer) {
     layer.on({
-        click: zoom_to
-        //mouseover: self.highlight,
-        //mouseout: self.reset_style,
+        click: zoom_to,
+        mouseover: highlight,
+        mouseout: reset_style
         //dblclick: self.click_ev
     });
 };

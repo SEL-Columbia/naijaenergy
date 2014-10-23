@@ -1,7 +1,7 @@
 var leaflet = require('leaflet');
 var http = require('http');
 var get_json = require('./get_json');
-var layer = require('./layer_module');
+var layer = require('./layer_prototype');
 
 leaflet.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
 
@@ -12,13 +12,13 @@ var nigeria_bounds = leaflet.latLngBounds(sw, ne);
 
 var map_div = 'map';
 var map = new leaflet.Map(map_div).fitBounds(nigeria_bounds);
+console.log(map);
 
 var osm_server = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
 var osm_layer = leaflet.tileLayer(osm_server, {
         attribution: "Open Street Map"
     });
 
-osm_layer.addTo(map);
 
 var gen_geojson_layer = function(map) {
     get_json('/state/__nigeria', function(err, data) {
@@ -27,6 +27,7 @@ var gen_geojson_layer = function(map) {
 };
 
 gen_geojson_layer(map);
+osm_layer.addTo(map);
 
 //
 //
