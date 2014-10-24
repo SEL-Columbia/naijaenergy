@@ -7,13 +7,11 @@ leaflet.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
 
 var map_div = 'map';
 var map = new leaflet.Map(map_div);//.fitBounds(nigeria_bounds);
-console.log(map);
 
 var osm_server = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
 var osm_layer = leaflet.tileLayer(osm_server, {
         attribution: "Open Street Map"
     });
-
 
 var gen_geojson_layer = function(map) {
     var self = this;
@@ -24,4 +22,5 @@ var gen_geojson_layer = function(map) {
 
 gen_geojson_layer(map);
 osm_layer.addTo(map);
+
 module.exports = map;

@@ -81,17 +81,13 @@ geojson_layer.prototype.highlight = function(ev) {
     }
 };
 
-geojson_layer.prototype.click_ev = function(ev) {
-    console.log(this);
-    this.zoom_to(ev);
-    //this.load_next_layer(ev);
-};
-
 geojson_layer.prototype.load_next_layer = function(ev) {
     var self = this;
     var slug = sluggify(ev.target.feature.properties.Name);
     get_json('/state/' + slug, function(err, res) {
-        var secondary_layer = new geojson_layer(res, self.map);
+        if (res.features.length > 0) {
+            var secondary_layer = new geojson_layer(res, self.map);
+        }
     });
 };
 
