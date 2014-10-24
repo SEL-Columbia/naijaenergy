@@ -86,7 +86,13 @@ geojson_layer.prototype.load_next_layer = function(ev) {
     var slug = sluggify(ev.target.feature.properties.Name);
     get_json('/state/' + slug, function(err, res) {
         if (res.features.length > 0) {
-            var secondary_layer = new geojson_layer(res, self.map);
+            // uniqueness of next_layer, 
+            // will write it so there's one of each level of layers
+            if (self.map.current_layer) {
+                self.map.removeLayer(self.map.current_layer);
+            }
+            var next_layer = new geojson_layer(res, self.map).layer;
+            self.map.current_layer = next_layer;
         }
     });
 };
