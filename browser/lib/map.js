@@ -1,7 +1,7 @@
 var leaflet = require('leaflet');
 var http = require('http');
 var get_json = require('./get_json');
-var layer = require('./layer_prototype');
+var layer = require('./layer');
 
 leaflet.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
 
