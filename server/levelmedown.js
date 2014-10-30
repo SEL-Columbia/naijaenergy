@@ -26,7 +26,12 @@ exports.write_geojson_db = function (lga, state, geojson_db) {
         get_unique_lga(function(lgas_json) {
             lgas.features.forEach(function(lga) {
                 var lga_id = lga.properties.lga_id;
-                geojson_db.put(lgas_json[lga_id], lga, function(err) {
+                var key = 'nigeria!!' +
+                          sluggify(lgas_json[lga_id].state) +
+                          '!!geojson!!'+
+                          sluggify(lgas_json[lga_id].lga);
+
+                geojson_db.put(key, lga, function(err) {
                     if (err)
                         throw err;
                 });
@@ -40,7 +45,7 @@ exports.write_geojson_db = function (lga, state, geojson_db) {
         states.features.forEach(function(state) {
             var state_name = sluggify(state.properties.Name);
             console.log(state_name);
-            geojson_db.put('__nigeria_' + state_name , state, function(err) {
+            geojson_db.put('nigeria!!geojson!!' + state_name , state, function(err) {
                 if (err)
                     throw err;
             });
@@ -54,9 +59,9 @@ exports.write_data_db = function(file, db) {
         .pipe(JSONStream.parse('*'))
         .on('data', function(data) {
             var key = data.state + 
-                      '::' +
+                      '!!' +
                       data.lga +
-                      '::' +
+                      '!!' +
                       data.survey_id;
             db.put(key, data, function(err) {
                 if (err)

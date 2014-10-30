@@ -11,7 +11,8 @@ var get_unique_file = function(cb){
     lgas_csv
         .pipe(csv({objectMode: true, columns: true}))
         .pipe(through(function(data){
-            id_obj[data["lga_id"]] = data['unique_lga'];
+            id_obj[data.lga_id] = {state: data.state,
+                                      lga: data.lga};
         }))
         .on('end', function() {
             cb(id_obj);
