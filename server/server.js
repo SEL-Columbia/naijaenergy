@@ -1,16 +1,19 @@
 var http  = require('http');
 var express = require('express');
+//var params = require('express-params');
 var compression = require('compression');
 var server = express();
 var get_geojson = require('./get_geojson');
 var get_data = require('./get_data');
 //var routing = require('router');
+//params.extend(server);
 server.use(compression());
 server.use(express.static(__dirname + '/../browser'));
+//server.param('geo', /.+/);
 
-server.get('/state/:state', function(req, res) {
-    var state = req.params.state;
-    get_geojson(state, function(err, data) {
+server.get(/^\/geojson\/(.*)/, function(req, res) {
+    var lvls = req.params[0].split('/');
+    get_geojson(lvls, function(err, data) {
         if (err)
             throw err;
         res.end(JSON.stringify(data));

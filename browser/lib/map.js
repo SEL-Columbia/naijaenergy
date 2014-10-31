@@ -15,7 +15,7 @@ var osm_layer = leaflet.tileLayer(osm_server, {
 
 var gen_geojson_layer = function(map) {
     var self = this;
-    get_json('/state/__nigeria', function(err, data) {
+    get_json('/geojson/guinea', function(err, data) {
         var state_layer = new layer(data, map);
     });
 };

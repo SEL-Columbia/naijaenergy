@@ -7,6 +7,11 @@ var mapreduce = require('map-reduce');
 var geojson_db = sub(level('db/geojson', {valueEncoding: 'json'}));
 var data_db = sub(level('db/data', {valueEncoding: 'json'}));
 
+/* this is a collection of functions
+ * that initialize database and
+ * dump data from geojson, etc.
+*/
+
 exports.data_db = data_db;
 exports.geojson_db = geojson_db;
 
@@ -52,6 +57,62 @@ exports.write_geojson_db = function (lga, state, geojson_db) {
         });
     });
 };
+
+exports.write_guinea_geojson = function(l1, l2, l3, db) {
+    // region
+    fs.readFile(l1, function(err, data) {
+        if (err)
+            throw err;
+        var gj = JSON.parse(data.toString());
+        gj.features.forEach(function(feat) {
+            var key = 'guinea!!' +
+                      'geojson!!'+
+                      sluggify(feat.properties.ADM1_NAME);
+
+            geojson_db.put(key, feat, function(err) {
+                if (err)
+                    throw err;
+            });
+        });
+    });
+    //prefecture
+    fs.readFile(l2, function(err, data) {
+        if (err)
+            throw err;
+        var gj = JSON.parse(data.toString());
+        gj.features.forEach(function(feat) {
+            var key = 'guinea!!' +
+                      sluggify(feat.properties.ADM1_NAME) +
+                      '!!geojson!!'+
+                      sluggify(feat.properties.ADM2_NAME);
+
+            geojson_db.put(key, feat, function(err) {
+                if (err)
+                    throw err;
+            });
+        });
+    });
+    //sous-prefecture
+    fs.readFile(l3, function(err, data) {
+        if (err)
+            throw err;
+        var gj = JSON.parse(data.toString());
+        gj.features.forEach(function(feat) {
+            var key = 'guinea!!' +
+                      sluggify(feat.properties.ADM1_NAME) +
+                      '!!'+
+                      sluggify(feat.properties.ADM2_NAME) +
+                      '!!geojson!!' +
+                      sluggify(feat.properties.ADM3_NAME);
+
+            geojson_db.put(key, feat, function(err) {
+                if (err)
+                    throw err;
+            });
+        });
+    });
+};
+//exports.write_guinea_geojson('guinea_region.json', 'guinea_prefecture.json', 'guinea_sous_prefecture.json', exports.geojson_db);
 
 exports.write_data_db = function(file, db) {
     var rs = fs.createReadStream(file);

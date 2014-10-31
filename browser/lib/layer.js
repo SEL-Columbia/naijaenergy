@@ -84,7 +84,7 @@ geojson_layer.prototype.highlight = function(ev) {
 geojson_layer.prototype.load_next_layer = function(ev) {
     var self = this;
     var slug = sluggify(ev.target.feature.properties.Name);
-    get_json('/state/' + slug, function(err, res) {
+    get_json('/geojson/' + slug, function(err, res) {
         if (res.features.length > 0) {
             // uniqueness of next_layer, 
             // will write it so there's one of each level of layers

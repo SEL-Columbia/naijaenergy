@@ -2,7 +2,9 @@ var level = require('level');
 var sub = require('level-sublevel');
 var geojson_sub = require('./levelmedown').geojson_db;
 var pipeline = function(collection, cb) {
-    var rs = geojson_sub.createReadStream({start: collection, end: collection + '\xff'});
+    var key = collection.join('!!') + '!!geojson!!';
+    var rs = geojson_sub.createReadStream({start: key, 
+                                           end: key + '\xff'});
     var geojson = { type: "FeatureCollection",
                     features: []
     };
