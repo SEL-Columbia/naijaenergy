@@ -11,7 +11,7 @@ server.use(compression());
 server.use(express.static(__dirname + '/../browser'));
 //server.param('geo', /.+/);
 
-server.get(/^\/geojson\/(.*)/, function(req, res) {
+server.get(/^\/geojson\/(.*?)\/?$/, function(req, res) {
     var lvls = req.params[0].split('/');
     get_geojson(lvls, function(err, data) {
         if (err)

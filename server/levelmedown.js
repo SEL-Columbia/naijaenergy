@@ -169,7 +169,7 @@ exports.get_data = function(db, rg) {
     db
         .createReadStream({range: rg})
         .on('data', function(data) {
-            console.log(data.value);
+            console.log(data.key, data.value);
         });
 };
 
