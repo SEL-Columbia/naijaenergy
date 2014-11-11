@@ -1,29 +1,34 @@
 var leaflet = require('leaflet');
+var util = require('util');
 var get_json = require('./get_json');
 
-var geojson_layer = function(geojson, map) {
+var geojson_layer = function(map) {
     var self = this;
-    this.geojson = geojson;
+    this.name_arr = Array.prototype.slice.call(arguments, 1);
     this.map = map;
-    this.click_ev = function(ev) {
-        self.zoom_to(ev);
-        self.load_next_layer(ev);
-    };
-    this.reset_style = function(ev) {
-        return self.layer.resetStyle(ev.target);
-    };
-    this.layer = leaflet.geoJson(self.geojson, {
-        style: self.style,
-        onEachFeature: function(feature, layer) {
-            layer.on({
-                click: self.click_ev,
-                mouseover: self.highlight,
-                mouseout: self.reset_style,
-            });
-        }
-    }).addTo(map);
-    this.map.fitBounds(this.layer.getBounds());
-
+    this.path = '/geojson/' + this.name_arr.join('/'); 
+    get_json(this.path, function(err, data) {
+        self.geojson = data;
+    //self.geojson = geojson;
+        self.click_ev = function(ev) {
+            self.zoom_to(ev);
+            self.load_next_layer(ev);
+        };
+        self.reset_style = function(ev) {
+            return self.layer.resetStyle(ev.target);
+        };
+        self.layer = leaflet.geoJson(self.geojson, {
+            style: self.style,
+            onEachFeature: function(feature, layer) {
+                layer.on({
+                    click: self.click_ev,
+                    mouseover: self.highlight,
+                    mouseout: self.reset_style,
+                });
+            }
+        }).addTo(map);
+        self.map.fitBounds(self.layer.getBounds());
+    });
 };
 
 var sluggify = function(name) {
@@ -33,18 +38,17 @@ var sluggify = function(name) {
                 .replace(/\s+/gi, "_");
 };
 
-geojson_layer.prototype.layer = function() {
-    var self = this;
-    return leaflet.geoJson(self.geojson, {
-        style: self.style,
-        onEachFeature: function(feature, layer) {
-            layer.on({
-                click: self.click_ev,
+var next_level = function(properties, name_arr) {
+    if (name_arr[0] === 'guinea') {
+        var next_name = util.format('ADM%d_NAME', name_arr.length);
+        name_arr.push(sluggify(properties[next_name]));
+        return name_arr;
+    } 
 
-            });
-            //self.on_each_feature(feature, layer);
-        }
-    }).addTo(self.map);
+    if (name_arr[0] === 'nigeria') {
+        name_arr.push(sluggify(properties.Name));
+        return name_arr;
+    }
 };
 
 var heat_color = function(d) {
@@ -83,18 +87,11 @@ geojson_layer.prototype.highlight = function(ev) {
 
 geojson_layer.prototype.load_next_layer = function(ev) {
     var self = this;
-    var slug = sluggify(ev.target.feature.properties.Name);
-    get_json('/geojson/' + slug, function(err, res) {
-        if (res.features.length > 0) {
-            // uniqueness of next_layer, 
-            // will write it so there's one of each level of layers
-            if (self.map.current_layer) {
-                self.map.removeLayer(self.map.current_layer);
-            }
-            var next_layer = new geojson_layer(res, self.map).layer;
-            self.map.current_layer = next_layer;
-        }
-    });
+    var next_arr = next_level(ev.target.feature.properties, self.name_arr);
+    var args = [self.map];
+    next_arr.map(function(item) { args.push(item); });
+    var next_layer = geojson_layer.apply(this, args);
+
 };
 
 geojson_layer.prototype.zoom_to = function(ev) {

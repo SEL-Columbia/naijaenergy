@@ -10,17 +10,11 @@ var map = new leaflet.Map(map_div);//.fitBounds(nigeria_bounds);
 
 var osm_server = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
 var osm_layer = leaflet.tileLayer(osm_server, {
-        attribution: "Open Street Map"
-    });
+    attribution: "Open Street Map"
+});
 
-var gen_geojson_layer = function(map) {
-    var self = this;
-    get_json('/geojson/guinea', function(err, data) {
-        var state_layer = new layer(data, map);
-    });
-};
+var state_layer = new layer(map, 'nigeria');
 
-gen_geojson_layer(map);
 osm_layer.addTo(map);
 
 module.exports = map;
