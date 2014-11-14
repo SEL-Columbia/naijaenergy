@@ -13,7 +13,7 @@ var osm_layer = leaflet.tileLayer(osm_server, {
     attribution: "Open Street Map"
 });
 
-var state_layer = new layer(map, 'nigeria');
+var state_layer = new layer(map, 'guinea');
 
 osm_layer.addTo(map);
 

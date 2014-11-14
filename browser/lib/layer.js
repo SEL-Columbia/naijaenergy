@@ -5,11 +5,11 @@ var get_json = require('./get_json');
 var geojson_layer = function(map) {
     var self = this;
     this.name_arr = Array.prototype.slice.call(arguments, 1);
+    this.level = this.name_arr.length;
     this.map = map;
     this.path = '/geojson/' + this.name_arr.join('/'); 
     get_json(this.path, function(err, data) {
         self.geojson = data;
-    //self.geojson = geojson;
         self.click_ev = function(ev) {
             self.zoom_to(ev);
             self.load_next_layer(ev);
@@ -27,6 +27,7 @@ var geojson_layer = function(map) {
                 });
             }
         }).addTo(map);
+        
         self.map.fitBounds(self.layer.getBounds());
     });
 };
@@ -46,7 +47,8 @@ var next_level = function(properties, name_arr) {
     } 
 
     if (name_arr[0] === 'nigeria') {
-        name_arr.push(sluggify(properties.Name));
+        name_arr
+            .push(sluggify(properties.Name));
         return name_arr;
     }
 };
