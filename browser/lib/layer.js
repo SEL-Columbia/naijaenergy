@@ -33,7 +33,7 @@ var geojson_layer = function(map) {
             self.map.current_layers.push(self.layer);
             self.layer.addTo(map);
             self.map.fitBounds(self.layer.getBounds());
-            $('#map_name')[0].textContent = self.name_arr.join('|');
+            $('#map_name').get(0).textContent = self.name_arr.join('|');
         }
     });
 };
