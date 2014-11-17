@@ -1,4 +1,4 @@
 watch:
-	watchify lib/* index.js -o bundle.js
+	watchify lib/* index.js -b mapping -o bundle.js
 build:
-	browserify lib/* index.js -o bundle.js
+	browserify lib/* index.js -b mapping -o bundle.js

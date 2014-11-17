@@ -117,7 +117,6 @@ geojson_layer.prototype.load_next_layer = function(ev) {
     var args = [self.map];
     next_arr.map(function(item) { args.push(item); });
     var next_layer = geojson_layer.apply(this, args);
-
 };
 
 geojson_layer.prototype.zoom_to = function(ev) {
@@ -126,4 +125,3 @@ geojson_layer.prototype.zoom_to = function(ev) {
 
 module.exports = geojson_layer;
     
-
