@@ -1,15 +1,11 @@
 var http  = require('http');
 var express = require('express');
-//var params = require('express-params');
 var compression = require('compression');
 var server = express();
 var get_geojson = require('./get_geojson');
 var get_data = require('./get_data');
-//var routing = require('router');
-//params.extend(server);
 server.use(compression());
 server.use(express.static(__dirname + '/../browser'));
-//server.param('geo', /.+/);
 
 server.get(/^\/geojson\/(.*?)\/?$/, function(req, res) {
     var lvls = req.params[0].split('/');

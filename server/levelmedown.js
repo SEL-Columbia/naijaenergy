@@ -57,6 +57,7 @@ exports.write_geojson_db = function (lga, state, geojson_db) {
         });
     });
 };
+//exports.write_geojson_db('lgas.json', 'states.json', exports.geojson_db);
 
 exports.write_guinea_geojson = function(l1, l2, l3, db) {
     // region
