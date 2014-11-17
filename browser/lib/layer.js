@@ -102,6 +102,7 @@ var which_map_layer = function(layer_arr, target) {
 };
 
 geojson_layer.prototype.load_next_layer = function(ev) {
+    var self = this;
     // remove all necessary layers
     var layer_level = which_map_layer(self.map.current_layers, ev.target);
     var layer_to_remove = self.map.current_layers.slice(layer_level + 1);
