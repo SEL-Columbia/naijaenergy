@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "description": "browser component of naijaenergy",
   "dependencies": {
-    "brfs": "^1.2.0",
     "d3": "^3.4.11",
     "hyperquest": "^0.3.0",
+    "jquery": "^2.1.1",
     "leaflet": "^0.7.3",
     "level": "^0.18.0",
-    "mori": "*",
+    "mori": "^0.2.9",
     "multilevel": "^6.0.1",
     "underscore": "^1.7.0"
   },
