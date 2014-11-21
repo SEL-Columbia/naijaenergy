@@ -17,6 +17,7 @@ var geojson_layer = function(map) {
                 self.load_next_layer(ev);
             };
             self.reset_style = function(ev) {
+                $('#curr_name').get(0).textContent = '';
                 return self.layer.resetStyle(ev.target);
             };
             self.layer = leaflet.geoJson(self.geojson, {
@@ -45,7 +46,6 @@ var sluggify = function(name) {
                 .replace(/\s+/gi, "_");
 };
 
-
 var heat_color = function(d) {
     return d > 30  ? '#800026' :
            d > 25  ? '#BD0026' :
@@ -60,19 +60,22 @@ geojson_layer.prototype.style = function(feature) {
         fillColor: heat_color(feature.properties.ID),
         weight: 2,
         opacity: 1,
-        color: 'white',
+        color: 'grey',
         dashArray: '3',
-        fillOpacity: 0.5
+        fillOpacity: 0.0
     };
 };
 
 geojson_layer.prototype.highlight = function(ev) {
     var layer = ev.target;
+    var prop = layer.feature.properties;
+    var curr_name = prop.ADM3_NAME || prop.ADM2_NAME || prop.ADM1_NAME;
+    $('#curr_name').get(0).textContent = curr_name;
     layer.setStyle({
         weight: 5,
         color: '#666',
         dashArray: '',
-        fillOpacity: 0.7
+        fillOpacity: 0.2
     });
     // ie shame
     if (!leaflet.Browser.ie && !leaflet.Browser.opera) {
