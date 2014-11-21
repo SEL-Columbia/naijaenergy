@@ -2,6 +2,7 @@ var level = require('level');
 var sub = require('level-sublevel');
 var _ = require('underscore');
 var JSONStream = require('JSONStream');
+var csv = require('csv-streamify');
 var fs = require('fs');
 var mapreduce = require('map-reduce');
 var geojson_db = sub(level('db/geojson', {valueEncoding: 'json'}));
@@ -131,6 +132,47 @@ exports.write_data_db = function(file, db) {
             });
         });
 };
+
+var dia = { FID: 'gin_heal_etu_pt_govt_etulocation.10',
+  the_geom: 'POINT (-12.08298682 10.37237752)',
+  UNIT_CODE: 'ETC-GIN-006',
+  UNIT_NAME: 'Mamou',
+  STATUS: 'UNDER CONSTRUCTION',
+  PLACE_NAME: 'Mamou',
+  ADM2_NAME: 'Mamou',
+  ADM1_NAME: 'Mamou Region',
+  LATITUDE: '10.372',
+  LONGITUDE: '-12.083',
+  BEDS_OPEN: '0',
+  BEDS_PLAN: '70',
+  PLAN_OPEN: '2014-11-19T16:44:32.045',
+  SUPPORTING: 'NONE',
+  COMMENT: '',
+  VALID_DATE: '2014-11-17T00:00:00',
+  ACCURACY: '',
+  CONT_NAME: '',
+  CONT_EMAIL: '',
+  'CONT_PH\r': '\r' };
+
+exports.write_guinea_data_db = function(file, db) {
+    var rs = fs.createReadStream(file);
+    var parser = csv({objectMode: true,
+                      columns: true});
+    parser.on('readable', function() {
+        var line = parser.read();
+        var ADM1 = line.ADM1_NAME.split(' Region')[0];
+        var ADM2 = line.ADM2_NAME;
+        var key = ['guinea', ADM1, ADM2, line.UNIT_CODE].map(function(item) {
+            return sluggify(item);}).join('!!');
+        db.put(key, line, function(err) {
+            if (err)
+                throw(err);
+        });
+    });
+    rs.pipe(parser);
+};
+
+//exports.write_guinea_data_db('gin_heal_etu_pt_govt_etulocation.csv', exports.data_db);
 
 var mapper = function (key, value, emit) {
     //key is fct_bwari!dsfsdfasfasf
